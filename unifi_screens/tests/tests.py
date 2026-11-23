@@ -564,3 +564,28 @@ class PluginTests(SimpleTestCase):
         from bdh_sdk.testing import assert_plugin_importable
 
         assert_plugin_importable("unifi_screens.plugin")
+
+class WorkerStartupTests(TestCase):
+    def test_schema_ready_once_migrated(self):
+        from unifi_screens import worker
+
+        self.assertTrue(worker.schema_ready())
+
+    def test_schema_ready_false_when_a_table_is_missing(self):
+        from unifi_screens import worker
+
+        with mock.patch("django.db.connection.introspection.table_names", return_value=["unifi_screens_kv"]):
+            self.assertFalse(worker.schema_ready())
+
+    def test_waits_for_migrate_before_starting(self):
+        from unifi_screens import worker
+
+        states = iter([False, False, True])
+        sleeps = []
+        self.assertTrue(worker.wait_for_schema(sleep=sleeps.append, ready=lambda: next(states)))
+        self.assertEqual(sleeps, [1, 1])
+
+    def test_gives_up_waiting_after_timeout(self):
+        from unifi_screens import worker
+
+        self.assertFalse(worker.wait_for_schema(sleep=lambda s: None, ready=lambda: False, timeout=3))

@@ -48,11 +48,38 @@ def poke():
     _wake.set()
 
 
+def schema_ready():
+    """True once the app's tables exist (the container migrates after ``ready()`` starts this thread)."""
+    from django.apps import apps
+    from django.db import connection
+
+    try:
+        tables = set(connection.introspection.table_names())
+    except Exception:
+        return False
+    finally:
+        connection.close()
+    return all(m._meta.db_table in tables for m in apps.get_app_config("unifi_screens").get_models())
+
+
+def wait_for_schema(sleep=time.sleep, ready=None, timeout=600):
+    ready = schema_ready if ready is None else ready
+    waited = 0
+    while not ready():
+        if waited >= timeout:
+            log.warning("unifi_screens: tables still missing after %s s; starting anyway", timeout)
+            return False
+        sleep(1)
+        waited += 1
+    return True
+
+
 def _run():
     from django.db import close_old_connections
 
     from . import executor, service
 
+    wait_for_schema()
     try:
         executor.recover_after_restart(service._dt(time.time()))
     except Exception:
