@@ -16,6 +16,7 @@ OUTAGE_GRACE_S = 300  # after any dependency outage, watch this long before acti
 GRACE_S = 120  # bad this long before step 1
 HEALTHY_RESET_S = 600  # continuously healthy this long resets the escalation
 MAX_POE_CYCLES = 3  # PoE cycles without recovery before giving up
+BREAKER_MIN_SCREENS = 2  # breaker needs this many enrolled AND quiet-while-linked
 
 RESTORE, REBOOT, POE = 1, 2, 3
 STEP_NAMES = {RESTORE: "restore kiosk", REBOOT: "Connect reboot", POE: "PoE power-cycle"}
@@ -126,10 +127,11 @@ def decide(now, screens, *, paused=False, site_unknown=""):
 
     # Site circuit breaker: several screens lose H at once while the network
     # still sees them -> the hub/ingress is the likely problem, not the screens.
+    # Only with >= 2 enrolled screens; a single screen relies on H=Unknown
+    # (broker down / hub just started) and the caps for hub-wide failures.
     enrolled = len(screens)
     quiet_but_linked = [o.mac for o, hs in zip(obs_list, status) if hs == BAD and o.l is True]
-    threshold = min(2, enrolled)
-    if enrolled and len(quiet_but_linked) >= threshold:
+    if enrolled >= BREAKER_MIN_SCREENS and len(quiet_but_linked) >= BREAKER_MIN_SCREENS:
         verdicts.append(Verdict("", "breaker", 0,
                                 f"{len(quiet_but_linked)} of {enrolled} screens quiet while connected",
                                 {"screens": quiet_but_linked}))

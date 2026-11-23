@@ -36,10 +36,12 @@ Safety rules:
 
 - **Unknown never acts.** If the broker or the Network console is down, nothing
   happens. After any outage there are 5 minutes of observation first.
-- **Circuit breaker.** If two or more enrolled screens go quiet together while
-  the network still sees them, the hub is the likely problem. It raises an alert
-  and touches nothing. With a single enrolled screen this means it never acts
-  while the link is up.
+- **Circuit breaker.** With two or more enrolled screens, if two or more go
+  quiet together while the network still sees them, the hub is the likely
+  problem. It raises an alert and touches nothing. With a single enrolled
+  screen there is no breaker; hub-wide failures are still covered because H is
+  Unknown while the broker is unreachable or the hub has just started, plus the
+  caps below.
 - **One recovery at a time.** At most one action per screen per observe window,
   and at most 6 PoE cycles per screen per day.
 - **PoE interlock.** The approved switch and port must match. The port must be

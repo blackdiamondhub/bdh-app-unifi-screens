@@ -144,6 +144,21 @@ class EngineTests(SimpleTestCase):
         self.assertEqual(acts(v), [])
         self.assertTrue(any(x.kind == "breaker" for x in v))
 
+    def test_two_screens_both_quiet_trip_the_breaker(self):
+        sim = Sim(A, B)
+        for t in (T0, T0 + 1000):
+            v = sim.step(t, [obs(A), obs(B)])
+        self.assertEqual(acts(v), [])
+        self.assertTrue(any(x.kind == "breaker" for x in v))
+
+    def test_single_screen_escalates_without_breaker(self):
+        sim = Sim(A)
+        sim.step(T0, [obs(A, connect=True)])
+        v = sim.step(T0 + 120, [obs(A, connect=True)])
+        self.assertFalse(any(x.kind == "breaker" for x in v))
+        self.assertEqual(acts(v), [(A, RESTORE)])
+        self.assertEqual(acts(sim.step(T0 + 240, [obs(A, connect=True)])), [(A, REBOOT)])
+
     def test_quiet_screens_without_link_are_not_a_site_problem(self):
         sim = Sim(A, B, C)
         sim.step(T0, [obs(A, l=False), obs(B, l=False), obs(C, h=True)])
