@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bdh-app-unifi-screens"
+version = "0.1.0b1"
+description = "Black Diamond Hub app: a watchdog that recovers UniFi Connect kiosk screens (dry run)"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = [
+    "bdh-sdk[ha]>=0.43,<1",
+    "requests",
+]
+
+[project.urls]
+Source = "https://github.com/blackdiamondlodge/bdh-app-unifi-screens"
+
+[project.entry-points."blackdiamondhub.plugins"]
+unifi_screens = "unifi_screens.plugin:spec"
+
+[tool.setuptools.packages.find]
+include = ["unifi_screens", "unifi_screens.*"]
+
+[tool.setuptools.package-data]
+unifi_screens = [
+    "templates/**/*",
+    "migrations/*.py",
+]
