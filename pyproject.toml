@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.urls]
-Source = "https://github.com/blackdiamondlodge/bdh-app-unifi-screens"
+Source = "https://github.com/blackdiamondhub/bdh-app-unifi-screens"
 
 [project.entry-points."blackdiamondhub.plugins"]
 unifi_screens = "unifi_screens.plugin:spec"
