@@ -62,9 +62,9 @@
         {% if p.pending %}<small class="us-fp us-bad">{% if p.trusted %}Now presenting{% else %}Presented{% endif %}: {{ p.pending }}</small>{% endif %}</div>
         <div class="ctl us-act">
             {% if p.pending %}<form method="post">{% csrf_token %}<input type="hidden" name="service" value="{{ p.service }}"><input type="hidden" name="fingerprint" value="{{ p.pending_raw }}">
-                <button class="hst-btn" name="action" value="trust" onclick="return confirm('Trust this certificate? Only do this if the fingerprint matches the console.')">Trust</button></form>{% endif %}
+                <button class="hst-btn" name="action" value="trust" data-bdh-confirm="Trust this certificate? Only do this if the fingerprint matches the console." data-bdh-confirm-ok="Trust">Trust</button></form>{% endif %}
             {% if p.trusted %}<form method="post">{% csrf_token %}<input type="hidden" name="service" value="{{ p.service }}">
-                <button class="hst-btn ghost" name="action" value="forget_pin" onclick="return confirm('Forget the pinned certificate?')">Re-pin</button></form>{% endif %}
+                <button class="hst-btn ghost" name="action" value="forget_pin" data-bdh-confirm="Forget the pinned certificate?" data-bdh-confirm-ok="Re-pin">Re-pin</button></form>{% endif %}
         </div></div>
     {% endfor %}
     <div class="hst-row"><small>The first certificate a console presents is only trusted after you click Trust. Compare the fingerprint with the one shown in the console's browser padlock. A changed certificate stops all calls to that console until you trust it again.</small></div>
@@ -86,8 +86,8 @@
             <td>{{ s.dry_runs }}<div class="us-ev">{{ s.dry_poe_24h }} PoE in 24 h</div></td>
             <td><div class="us-act">
                 <form method="post">{% csrf_token %}<input type="hidden" name="id" value="{{ s.e.pk }}"><button class="hst-btn ghost" name="action" value="recover">Recover now</button></form>
-                {% if s.e.topology_hold %}<form method="post">{% csrf_token %}<input type="hidden" name="id" value="{{ s.e.pk }}"><button class="hst-btn" name="action" value="reapprove" onclick="return confirm('Approve the new switch port?')">Re-approve</button></form>{% endif %}
-                <form method="post">{% csrf_token %}<input type="hidden" name="id" value="{{ s.e.pk }}"><button class="hst-btn ghost" name="action" value="unenroll" onclick="return confirm('Stop watching this screen?')">Unenroll</button></form>
+                {% if s.e.topology_hold %}<form method="post">{% csrf_token %}<input type="hidden" name="id" value="{{ s.e.pk }}"><button class="hst-btn" name="action" value="reapprove" data-bdh-confirm="Approve the new switch port?" data-bdh-confirm-ok="Re-approve" data-bdh-confirm-danger="0">Re-approve</button></form>{% endif %}
+                <form method="post">{% csrf_token %}<input type="hidden" name="id" value="{{ s.e.pk }}"><button class="hst-btn ghost" name="action" value="unenroll" data-bdh-confirm="Stop watching this screen?" data-bdh-confirm-ok="Unenroll">Unenroll</button></form>
             </div></td>
         </tr>
         {% empty %}
